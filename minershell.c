@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKEN_SIZE 64
@@ -72,6 +73,8 @@ int main(int argc, char* argv[]) {
           printf("Incorrect command to the display.\n");
         }
       }
+
+
         else{
    		int rc = fork();
    		pid_t cpid;
