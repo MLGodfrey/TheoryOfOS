@@ -1,5 +1,3 @@
-altminer.c
-a.out
 hello
 hello.c
 minershell

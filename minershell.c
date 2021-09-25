@@ -68,14 +68,14 @@ int main(int argc, char *argv[]){
 		// This changes the current directory of this process
 		else if(strcmp(*tokens, "cd")==0){
 			if(chdir(tokens[1]) == -1){
-				printf("%s", "Incorrect command to the display and prompting for the next command.\n");
+				printf("%s", "Incorrect command to the display.\n");
 			}
 		}
 
 		// Testing for user input "exit"
 		// This exits the main program for this process
 		else if (strcmp(*tokens, "exit") == 0 ){
-			printf("%s", "Thank you, now exiting program\n");
+			printf("%s", "Exitting\n");
 			exit(0);
 		}
 
@@ -91,12 +91,9 @@ int main(int argc, char *argv[]){
 				exit(1);
 			}
 
-			// child (new process)
+			// child
 			else if (rc == 0){
 
-
-				//duping mode
-				//Counting tokens
     			int count = 0;
 				char **clone = tokens;
     			while(*clone){
@@ -115,17 +112,17 @@ int main(int argc, char *argv[]){
 						char *pointer = line+5;
 						execlp(*tokens, *tokens, tokens[1], (char *)NULL);
 					}
-					// Taking in 2 flags
+					// Taking 2 flags
 					else if(count == 5 && execlp(*tokens, *tokens, tokens[1], tokens[2], (char *)NULL) == -1){
-						printf("%s", "Please enter a real command\n");
+						printf("%s", "Invalid command.\n");
 					}
-					// Taking in 1 flag
+					// Taking 1 flag
 					else if(count == 4 && execlp(*tokens, *tokens, tokens[1], (char *)NULL) == -1){
-						printf("%s", "Please enter a real command\n");
+						printf("%s", "Invalid command.\n");
 					}
-					// Taking in no flags
+					// Taking no flags
 					else if(count == 3 && execlp(*tokens, *tokens, (char *)NULL) == -1){
-						printf("%s", "Please enter a real command\n");
+						printf("%s", "Invalid command.\n");
 					}
 					close(fw);
 				}
@@ -136,16 +133,16 @@ int main(int argc, char *argv[]){
 					execlp(*tokens, *tokens, pointer, (char *)NULL);
 				}
 				else if(execlp(*tokens, *tokens, tokens[1], (char *)NULL) == -1){
-					printf("%s", "Please enter a real command\n");
+					printf("%s", "Invalid command.\n");
 				}
 				exit(0);
 			}
 			else{
-			wait(NULL); /* reaping parent */
+			wait(NULL); //reaping child
 			}
 		}
 
-		// Freeing the allocated memory
+		// Freeing allocated memory
 		for (i = 0; tokens[i] != NULL; i++){
 			free(tokens[i]);
 		}
