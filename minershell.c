@@ -85,7 +85,39 @@ int main(int argc, char* argv[]) {
    				exit(1);
    			} else if (rc == 0)
    			{
-   			if(execlp(*tokens, *tokens, tokens [1],  NULL) == -1){
+          int n = 0;
+          char **copy = tokens;
+          while(*copy){
+            copy++;
+            n += 1;
+          }
+          printf("%i", n);
+          if(n >= 2 && tokens[n-2] && strcmp(tokens[n-2], ">") == 0){
+            printf("%s", "Duplicating\n");
+            int fw = open(tokens[n-1], O_WRONLY | O_CREAT | O_TRUNC);
+            dup2(fw, STDOUT_FILENO);
+            dup2(fw, STDERR_FILENO);
+
+            if(strcmp(*tokens, "echo")==0){
+              char *pointer = line+5;
+              execlp(*tokens, *tokens, tokens[1], (char *)NULL);
+              }
+              else if(n == 5 && execlp(*tokens, *tokens, tokens[1], tokens[2], (char *)NULL)== -1){
+                printf("%s", "Invalid command.\n");
+              }
+              else if(n == 4 && execlp(*tokens, *tokens, tokens[1], (char *)NULL)== -1){
+                printf("%s", "Invalid command.\n");
+              }else if(n == 3 && execlp(*tokens, *tokens, (char *)NULL) == -1){
+                printf("%s", "Invalid command.\n");
+              }
+              close(fw);
+          }
+
+          else if(strcmp(*tokens, "echo")==0){
+            char *pointer = line+5;
+            execlp(*tokens, *tokens, tokens[1], (char *)NULL);
+            }
+   			else if(execlp(*tokens, *tokens,  NULL) == -1){
           printf("%s", "Invalid command.\n");
           }
    				exit(0);
