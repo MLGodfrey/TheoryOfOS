@@ -1,0 +1,8 @@
+altminer.c
+a.out
+hello
+hello.c
+minershell
+minershell.c
+output.txt
+test

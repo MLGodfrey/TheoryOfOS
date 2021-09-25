@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -95,7 +94,7 @@ int main(int argc, char *argv[]){
 			else if (rc == 0){
 
 
-				//duping mode
+				//switching to dupping mode
 				//Counting tokens
     			int count = 0;
 				char **clone = tokens;
