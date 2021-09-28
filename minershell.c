@@ -56,30 +56,28 @@ int main(int argc, char *argv[]){
 		scanf("%[^\n]", line);
 		getchar();
 
-		line[strlen(line)] = '\n'; //terminate with new line
+		line[strlen(line)] = '\n';
 		tokens = tokenize(line);
 
 		if(*tokens == NULL){
-			//pass
+
 		}
 
 
-		// Testing for user input "cd"
-		// This changes the current directory of this process
+
 		else if(strcmp(*tokens, "cd")==0){
 			if(chdir(tokens[1]) == -1){
 				printf("%s", "Incorrect command to the display.\n");
 			}
 		}
 
-		// Testing for user input "exit"
-		// This exits the main program for this process
+
 		else if (strcmp(*tokens, "exit") == 0 ){
 			printf("%s", "Exitting\n");
 			exit(0);
 		}
 
-		// Checking user input for various commands that may exist
+		
 		else if(*tokens){
 
 

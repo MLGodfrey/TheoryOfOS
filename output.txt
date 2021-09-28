@@ -1,6 +1,1 @@
-hello
-hello.c
-minershell
-minershell.c
-output.txt
 test
