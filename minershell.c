@@ -67,19 +67,35 @@ int main(int argc, char *argv[]){
 
 		else if(strcmp(*tokens, "cd")==0){
 			if(chdir(tokens[1]) == -1){
-				printf("%s", "Incorrect command to the display.\n");
+				printf("%s", "--Incorrect command to the display.\n");
 			}
 		}
 
 
 		else if (strcmp(*tokens, "exit") == 0 ){
-			printf("%s", "Exitting\n");
+			printf("%s", "--Exitting\n");
 			exit(0);
 		}
 
-		
+
 		else if(*tokens){
 
+			char **index = tokens;
+			int piping = 0;
+			while( *index != 0 ){
+				if( strcmp(*index, "|") ==0 ){
+					printf("%s", "--Piping\n");
+					piping = 1;
+					break;
+				}
+				index++;
+			}
+
+			int fd[2];
+			if(piping && pipe(fd) == -1){
+				char error_message[30] = "An error has occurred.\n";
+				write(STDERR_FILENO,error_message,strlen(error_message));
+			}
 
 
 			int rc = fork();
@@ -92,51 +108,81 @@ int main(int argc, char *argv[]){
 			// child
 			else if (rc == 0){
 
-    			int count = 0;
+				int count = 0;
 				char **clone = tokens;
-    			while(*clone){
-        			clone++;
-        			count += 1;
+				while(*clone){
+					clone++;
+					count += 1;
 				}
 
-				// Changing outputs by detecting > argument
-				if(count >= 2 && tokens[count-2] && strcmp(tokens[count-2], ">") == 0){
-					printf("%s", "Duplicating\n");
+
+				//---------------------checking if piping-------------
+				if(piping){
+					dup2(fd[1], STDOUT_FILENO);
+					close(fd[0]);
+					close(fd[1]);
+					execlp(tokens[0], tokens[0], (char *)NULL);
+				}
+				//------------------------checking if redirecting------
+				if(!piping && count >= 2 && tokens[count-2] && strcmp(tokens[count-2], ">") == 0){
+					printf("%s", "--Duplicating\n");
 					int fw = open(tokens[count-1],  O_WRONLY | O_CREAT | O_TRUNC);
 					dup2(fw, STDOUT_FILENO);
 					dup2(fw, STDERR_FILENO);
 
+					//special echo case
 					if(strcmp(*tokens, "echo")==0){
 						char *pointer = line+5;
 						execlp(*tokens, *tokens, tokens[1], (char *)NULL);
 					}
-					// Taking 2 flags
+					// 2 flags case
 					else if(count == 5 && execlp(*tokens, *tokens, tokens[1], tokens[2], (char *)NULL) == -1){
-						printf("%s", "Invalid command.\n");
+						printf("%s", "--Invalid command.\n");
 					}
-					// Taking 1 flag
+					// single flag case
 					else if(count == 4 && execlp(*tokens, *tokens, tokens[1], (char *)NULL) == -1){
-						printf("%s", "Invalid command.\n");
+						printf("%s", "--Invalid command.\n");
 					}
-					// Taking no flags
+
 					else if(count == 3 && execlp(*tokens, *tokens, (char *)NULL) == -1){
-						printf("%s", "Invalid command.\n");
+						printf("%s", "--Invalid command.\n");
 					}
 					close(fw);
 				}
 
 
-				else if(strcmp(*tokens, "echo")==0){
+
+				else if(!piping && strcmp(*tokens, "echo")==0){
 					char *pointer = line+5;
 					execlp(*tokens, *tokens, pointer, (char *)NULL);
 				}
-				else if(execlp(*tokens, *tokens, tokens[1], (char *)NULL) == -1){
-					printf("%s", "Invalid command.\n");
+
+
+				else if(!piping && execlp(*tokens, *tokens, tokens[1], (char *)NULL) == -1){
+					printf("%s", "--Invalid command.\n");
 				}
 				exit(0);
 			}
+
 			else{
-			wait(NULL); //reaping child
+				if(piping){
+					int child2 = fork();
+					if(child2 == 0){
+						dup2(fd[0], STDIN_FILENO);
+						close(fd[0]);
+						close(fd[1]);
+						if(execlp(tokens[2], tokens[2], (char *)NULL)==-1){
+							printf("%s", "--Invalid command.");
+						}
+						exit(0);
+					}
+					else{
+						close(fd[0]);
+						close(fd[1]);
+						wait(NULL);
+					}
+				}
+				wait(NULL);
 			}
 		}
 
